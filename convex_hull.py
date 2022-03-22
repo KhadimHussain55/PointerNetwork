@@ -1,4 +1,5 @@
 # coding=utf-8
+from os import system
 import numpy as np
 import matplotlib.pyplot as plt
 import tqdm
@@ -58,6 +59,7 @@ if __name__ == "__main__":
   train_ds = CHDataset(args.train_filename, args.max_in_seq_len,
     args.max_out_seq_len)
   logger.info("Train data size: {}".format(len(train_ds)))
+
   train_dl = DataLoader(train_ds, num_workers=2, batch_size=args.bz) 
   # Init model
   model = PointerNet("LSTM",
@@ -93,7 +95,6 @@ if __name__ == "__main__":
       optimizer.zero_grad()
       align_score = model(b_inp, b_inp_len, b_outp_in, b_outp_len)
       loss = criterion(b_outp_out, align_score, b_outp_len)
-
       l = loss.data
       total_loss += l
       batch_cnt += 1
@@ -112,9 +113,10 @@ if __name__ == "__main__":
 #Ploting loss using matplotlib
     ep.append(epoch)
     ls.append(total_loss / batch_cnt)
-  plt.style.context('dark_background')
-  plt.plot( ls, lw=5)
+  plt.plot(ep,ls, lw=3)
   plt.xlabel("Loss")
   plt.ylabel("Epoch")
   plt.title("Loss per epoch")
+  plt.savefig("loss.png")
   plt.show()
+  sys.exit()
